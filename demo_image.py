@@ -3,10 +3,13 @@ import time
 
 import cv2
 
-from processing import extract_parts, draw
-
-from config_reader import config_reader
+from config_reader import read_config
+from processing import extract_parts
+from output import draw, init_out_file, append_to_out_file
 from model.cmu_model import get_testing_model
+
+output_file = './out.txt'
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -30,12 +33,15 @@ if __name__ == '__main__':
     model.load_weights(keras_weights_file)
 
     # load config
-    params, model_params = config_reader()
+    params, model_params = read_config()
     
     input_image = cv2.imread(image_path)  # B,G,R order
     
-    all_peaks, subset, candidate = extract_parts(input_image, params, model, model_params)
-    canvas = draw(input_image, all_peaks, subset, candidate)
+    subsets, candidates = extract_parts(input_image, params, model, model_params)
+    canvas = draw(input_image, subsets, candidates)
+
+    init_out_file(output_file)
+    append_to_out_file(output_file, subsets, candidates)
     
     toc = time.time()
     print('processing time is %.5f' % (toc - tic))
@@ -43,6 +49,3 @@ if __name__ == '__main__':
     cv2.imwrite(output, canvas)
 
     cv2.destroyAllWindows()
-
-
-
