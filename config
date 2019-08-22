@@ -33,4 +33,4 @@ boxsize = 368
 padValue = 128
 np = 12
 stride = 8
-part_str = [nose, neck, Rsho, Relb, Rwri, Lsho, Lelb, Lwri, Rhip, Rkne, Rank, Lhip, Lkne, Lank, Leye, Reye, Lear, Rear, pt19]
+part_str = [nose, neck, Rsho, Relb, Rwri, Lsho, Lelb, Lwri, Rhip, Rkne, Rank, Lhip, Lkne, Lank, Reye, Leye, Rear, Lear, pt19]
