@@ -1,18 +1,18 @@
 import os
 import sys
 import argparse
-import cv2
 import time
-from config_reader import config_reader
 
-from processing import extract_parts, draw
+import cv2
 
+from config_reader import read_config
+from processing import extract_parts
+from output import draw
 from model.cmu_model import get_testing_model
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-currentDT = time.localtime()
-start_datetime = time.strftime("-%m-%d-%H-%M-%S", currentDT)
+start_datetime = time.strftime("-%m-%d-%H-%M-%S", time.localtime())
 
 
 if __name__ == '__main__':
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     model.load_weights(keras_weights_file)
 
     # load config
-    params, model_params = config_reader()
+    params, model_params = read_config()
 
     # Video reader
     cam = cv2.VideoCapture(video_file)
@@ -80,8 +80,8 @@ if __name__ == '__main__':
             tic = time.time()
 
             # generate image with body parts
-            all_peaks, subset, candidate = extract_parts(input_image, params, model, model_params)
-            canvas = draw(orig_image, all_peaks, subset, candidate)
+            subsets, candidates = extract_parts(input_image, params, model, model_params)
+            canvas = draw(orig_image, subsets, candidates)
 
             print('Processing frame: ', i)
             toc = time.time()
