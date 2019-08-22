@@ -1,17 +1,21 @@
 import numpy as np
-from io import StringIO
 import PIL.Image
+from io import StringIO
 from IPython.display import Image, display
 
+from config_reader import read_config
+
 # find connection in the specified sequence, center 29 is in the position 15
-limbSeq = [[2, 3], [2, 6], [3, 4], [4, 5], [6, 7], [7, 8], [2, 9], [9, 10],
-           [10, 11], [2, 12], [12, 13], [13, 14], [2, 1], [1, 15], [15, 17],
-           [1, 16], [16, 18], [3, 17], [6, 18]]
+part_seq = np.array([[2, 3], [2, 6], [3, 4], [4, 5], [6, 7], [7, 8], [2, 9], [9, 10],
+                     [10, 11], [2, 12], [12, 13], [13, 14], [2, 1], [1, 15], [15, 17],
+                     [1, 16], [16, 18], [3, 17], [6, 18]])
 
 # the middle joints heatmap correpondence
-hmapIdx = [[31, 32], [39, 40], [33, 34], [35, 36], [41, 42], [43, 44], [19, 20], [21, 22],
-           [23, 24], [25, 26], [27, 28], [29, 30], [47, 48], [49, 50], [53, 54], [51, 52],
-           [55, 56], [37, 38], [45, 46]]
+limb_paf_idx = [[31, 32], [39, 40], [33, 34], [35, 36], [41, 42], [43, 44], [19, 20], [21, 22],
+                [23, 24], [25, 26], [27, 28], [29, 30], [47, 48], [49, 50], [53, 54], [51, 52],
+                [55, 56], [37, 38], [45, 46]]
+
+assert len(part_seq) == len(limb_paf_idx)
 
 # visualize
 colors = [[255, 0, 0], [255, 85, 0], [255, 170, 0], [255, 255, 0], [170, 255, 0], [85, 255, 0],
@@ -34,15 +38,6 @@ def showmap(a, fmt='png'):
     f = StringIO()
     PIL.Image.fromarray(a).save(f, fmt)
     display(Image(data=f.getvalue()))
-
-
-# def checkparam(param):
-#    octave = param['octave']
-#    starting_range = param['starting_range']
-#    ending_range = param['ending_range']
-#    assert starting_range <= ending_range, 'starting ratio should <= ending ratio'
-#    assert octave >= 1, 'octave should >= 1'
-#    return starting_range, ending_range, octave
 
 
 def get_jet_color(v, vmin, vmax):
@@ -81,9 +76,7 @@ def pad_right_down_corner(img, stride, pad_value):
     h = img.shape[0]
     w = img.shape[1]
 
-    pad = 4 * [None]
-    pad[0] = 0  # up
-    pad[1] = 0  # left
+    pad = [0, 0, 0, 0]
     pad[2] = 0 if (h % stride == 0) else stride - (h % stride)  # down
     pad[3] = 0 if (w % stride == 0) else stride - (w % stride)  # right
 
@@ -98,3 +91,9 @@ def pad_right_down_corner(img, stride, pad_value):
     img_padded = np.concatenate((img_padded, pad_right), axis=1)
 
     return img_padded, pad
+
+
+def get_parts_order():
+    _,  model_params = read_config()
+
+    return model_params['part_str']
