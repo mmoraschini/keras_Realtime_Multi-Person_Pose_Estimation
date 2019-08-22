@@ -10,7 +10,7 @@ m = get_testing_model()
 
 for layer in m.layers:
     layer_name = layer.name
-    if (os.path.exists(os.path.join(CAFFE_LAYERS_DIR, "W_%s.npy" % layer_name))):
+    if os.path.exists(os.path.join(CAFFE_LAYERS_DIR, "W_%s.npy" % layer_name)):
         w = np.load(os.path.join(CAFFE_LAYERS_DIR, "W_%s.npy" % layer_name))
         b = np.load(os.path.join(CAFFE_LAYERS_DIR, "b_%s.npy" % layer_name))
 
