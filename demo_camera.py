@@ -1,12 +1,13 @@
 import os
 import sys
 import argparse
-import cv2
 import time
-from config_reader import config_reader
 
-from processing import extract_parts, draw
+import cv2
 
+from config_reader import read_config
+from processing import extract_parts
+from output import draw
 from model.cmu_model import get_testing_model
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
@@ -24,7 +25,7 @@ if __name__ == '__main__':
     parser.add_argument('--device', type=int, default=0, help='ID of the device to open')
     parser.add_argument('--model', type=str, default='model/keras/model.h5', help='path to the weights file')
     parser.add_argument('--frame_ratio', type=int, default=7, help='analyze every [n] frames')
-    # --process_speed changes at how many times the model analyzes each frame at a different scale
+    # --process_speed changes how many scales the model analyzes each frame at
     parser.add_argument('--process_speed', type=int, default=1,
                         help='Int 1 (fastest, lowest quality) to 4 (slowest, highest quality)')
     parser.add_argument('--out_name', type=str, default=None, help='name of the output file to write')
@@ -47,7 +48,7 @@ if __name__ == '__main__':
     model.load_weights(keras_weights_file)
 
     # load config
-    params, model_params = config_reader()
+    params, model_params = read_config()
 
     # Video reader
     cam = cv2.VideoCapture(device)
@@ -105,8 +106,8 @@ if __name__ == '__main__':
         input_image = cv2.cvtColor(input_image, cv2.COLOR_RGB2BGR)
 
         # generate image with body parts
-        all_peaks, subset, candidate = extract_parts(input_image, params, model, model_params)
-        canvas = draw(cropped, all_peaks, subset, candidate, resize_fac=resize_fac)
+        subsets, candidates = extract_parts(input_image, params, model, model_params)
+        canvas = draw(cropped, subsets, candidates, resize_fac=resize_fac)
 
         print('Processing frame: ', i)
         toc = time.time()
