@@ -17,8 +17,8 @@ def draw(input_image, subsets, candidates, resize_fac=1):
     This function draws body parts and joints over an image
 
     :param input_image: cv2 image to draw on
-    :param subsets: ndarray of subsets, one line for subset (i.e. person)
-    :param candidates: ndarray of body parts candidates, one line for body part
+    :param subsets: ndarray of subsets, one line for subset (i.e. person) as returned by processing.extract_parts()
+    :param candidates: ndarray of body parts candidates, one line for part as returned by processing.extract_parts()
     :param resize_fac: resize factor of the output
     :return: cv2 image with parts and joints drawn on
     """
@@ -53,6 +53,11 @@ def draw(input_image, subsets, candidates, resize_fac=1):
 
 
 def init_out_file(path):
+    """
+    Inits the output file with a header.
+    The output file will contain the body parts positions for each subset (i.e. person), for each frame
+    :param path: path of the file to write
+    """
 
     with open(path, 'w') as f:
         f.write('[Header]\n')
@@ -65,6 +70,21 @@ def init_out_file(path):
 
 
 def append_to_out_file(path, subsets, candidates):
+    """
+    Appends to the output file the body parts positions of each subset (i.e. person).
+    The format is:
+
+    `
+    [timestamp in ISO 8601 format]
+    one line for each subset, three columns for each body part in the order (x, y, score) and a final column with the
+    overall score of the subset
+    `
+    Body parts are ordered as returned by util.get_parts_order()
+
+    :param path: path of the file to write
+    :param subsets: ndarray of subsets, one line for subset (i.e. person) as returned by processing.extract_parts()
+    :param candidates: ndarray of body parts candidates, one line for part as returned by processing.extract_parts()
+    """
 
     # Timestamp in ISO 8601 format
     timestamp = datetime.now().isoformat()
@@ -81,6 +101,7 @@ def append_to_out_file(path, subsets, candidates):
                     line += candidates[rowid, :2].astype(int).tolist() + [candidates[rowid, 2]]
                 else:
                     line += [-1, -1, -1]
+            line += [subsets[i, -2]]
             f.write(str(line) + '\n')
 
     # subsets_dict = {}
