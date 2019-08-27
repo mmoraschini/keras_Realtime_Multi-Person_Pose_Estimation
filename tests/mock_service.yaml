@@ -1,0 +1,55 @@
+swagger: "2.0"
+
+info:
+  title: "Mock testing API"
+  version: "1.0"
+
+basePath: /v1.0
+
+schemes:
+  - http
+paths:
+  /data/get:
+    get:
+      operationId: mock_api.get
+      responses:
+        '200':
+          description: 'Fetch a list of mock data'
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Data'
+
+  /data/add:
+    post:
+      operationId: mock_api.post
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: payload
+          description: json mapping of a python dict with a string and an int
+          required: true
+          schema:
+            type: object
+            $ref: '#/definitions/Data'
+      responses:
+        201:
+          description: Item successfully appended
+        400:
+          description: invalid input
+        409:
+          description: item already exists
+
+definitions:
+  Data:
+    type: object
+    required:
+      - str
+      - num
+    properties:
+      str:
+        type: string
+      num:
+        type: integer
+        format: int32
