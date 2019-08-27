@@ -1,7 +1,5 @@
 import numpy as np
-import PIL.Image
-from io import StringIO
-from IPython.display import Image, display
+import matplotlib.pyplot as plt
 
 from config_reader import read_config
 
@@ -25,19 +23,21 @@ colors = [[255, 0, 0], [255, 85, 0], [255, 170, 0], [255, 255, 0], [170, 255, 0]
           [170, 0, 255], [255, 0, 255], [255, 0, 170], [255, 0, 85]]
 
 
-def show_bgr_image(a, fmt='jpeg'):
-    a = np.uint8(np.clip(a, 0, 255))
+def show_bgr_image(a, path=None, fmt='jpeg'):
     a[:, :, [0, 2]] = a[:, :, [2, 0]]  # for B,G,R order
-    f = StringIO()
-    PIL.Image.fromarray(a).save(f, fmt)
-    display(Image(data=f.getvalue()))
+    plt.figure()
+    plt.imshow(a)
+    if path is not None:
+        a = np.uint8(np.clip(a, 0, 255))
+        plt.savefig(path, format=fmt)
 
 
-def showmap(a, fmt='png'):
-    a = np.uint8(np.clip(a, 0, 255))
-    f = StringIO()
-    PIL.Image.fromarray(a).save(f, fmt)
-    display(Image(data=f.getvalue()))
+def showmap(a, path=None, fmt='png'):
+    plt.figure()
+    plt.imshow(a)
+    if path is not None:
+        a = np.interp(a, (a.min(), a.max()), (0, 255)).astype(np.uint8)
+        plt.savefig(path, format=fmt)
 
 
 def get_jet_color(v, vmin, vmax):
