@@ -1,0 +1,100 @@
+swagger: "2.0"
+
+info:
+  title: "Pose estimation API"
+  version: "0.1"
+
+basePath: /v0.1
+
+schemes:
+  - http
+paths:
+  /subsets/get:
+    get:
+      tags:
+        - public
+      operationId: api.subsets.get
+      responses:
+        '200':
+          description: 'Fetch a list of subsets'
+          schema:
+            type: object
+            $ref: '#/definitions/Frames'
+  /subsets/add:
+    post:
+      tags:
+        - public
+      operationId: api.subsets.post
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: payload
+          description: Frame containing all subsets
+          required: true
+          schema:
+            type: object
+            $ref: '#/definitions/Frame'
+      responses:
+        201:
+          description: Frame successfully posted
+        400:
+          description: invalid input
+        409:
+          description: item already exists
+
+
+tags:
+- name: public
+  description: Operation available to everyone
+- name: admins
+  description: Admins-only call
+
+definitions:
+  Frames:
+    type: array
+    items:
+      $ref: '#/definitions/Frame'
+  Frame:
+    type: object
+    required:
+      - timestamp
+    properties:
+      timestamp:
+        type: string
+      id:
+        type: object
+        $ref: '#definitions/Id'
+  Id:
+    type: object
+    required:
+      - parts
+      - score
+      - n_parts
+    properties:
+      parts:
+        type: array
+        items:
+          $ref: '#/definitions/Part'
+      score:
+        type: number
+        format: float
+      n_parts:
+        type: integer
+        format: int32
+  Part:
+    type: object
+    required:
+      - x
+      - y
+      - score
+    properties:
+      x:
+        type: integer
+        format: uint16
+      y:
+        type: integer
+        format: uint16
+      score:
+        type: number
+        format: float
